@@ -120,13 +120,24 @@ public class BallMoverActivity extends Activity {
 
 			@Override
 			public void discoveryComplete(List<Sphero> spheros) {
-				msg("discoveryComplete: found " + spheros.size() + " robots");
+				msg("discoveryComplete: " + spheros);
 			}
 
 			@Override
-			public void onFound(List<Sphero> sphero) {
-				msg("onFound " + sphero);
-				mRobotMgr.connect(sphero.iterator().next());
+			public void onFound(List<Sphero> spheros) {
+				if (false) {
+					msgLong("onFound: " + spheros);
+					mRobotMgr.connect(spheros.iterator().next());
+				}
+				else{
+					for (Sphero sphero : spheros) {
+						msgLong("onFound: " + sphero);
+						mRobotMgr.control(sphero);
+//						mRobotMgr.endDiscovery();
+//						break;
+					}
+					mRobotMgr.connectControlledRobots();
+				}
 			}
 		});
 	}
