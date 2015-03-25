@@ -1,34 +1,74 @@
 package com.cre.ballmover;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import orbotix.robot.base.CollisionDetectedAsyncData;
+import orbotix.robot.base.Robot;
+import orbotix.robot.base.RobotProvider;
+import orbotix.robot.sensor.DeviceSensorsData;
+import orbotix.sphero.CollisionListener;
+import orbotix.sphero.ConfigurationControl;
+import orbotix.sphero.ConnectionListener;
+import orbotix.sphero.DiscoveryListener;
+import orbotix.sphero.PersistentOptionFlags;
+import orbotix.sphero.SensorControl;
+import orbotix.sphero.SensorFlag;
+import orbotix.sphero.SensorListener;
+import orbotix.sphero.Sphero;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
-import orbotix.robot.base.*;
 
-import orbotix.robot.sensor.DeviceSensorsData;
-import orbotix.sphero.*;
-
-/** Connects to an available Sphero robot, and then flashes its LED. */
 public class BallMoverActivity extends Activity {
 	public static final String TAG = "BallMover";
 
-	/** The Sphero Robot */
-	private Sphero mRobot;
+	private RobotProvider mRobotMgr;
+	private ConfigurationControl mRobotCfg;
 
-	private boolean connecting = false;
+	float mHeading = 0;
+	Map<String, Sphero> mRobots = new HashMap<String, Sphero>();
 
-	void MsgBox(String msg) {
+	void msg(String msg) {
 		Log.d(TAG, msg);
 		Toast.makeText(BallMoverActivity.this, msg, Toast.LENGTH_SHORT).show();
 	}
 
-	void MsgLongBox(String msg) {
+	void msgLong(String msg) {
 		Log.i(TAG, msg);
 		Toast.makeText(BallMoverActivity.this, msg, Toast.LENGTH_LONG).show();
+	}
+
+	private static final int MSG_ROTATE = 0;
+
+	private Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case MSG_ROTATE:
+				for (Sphero robot : mRobots.values()) {
+					robot.rotate((mHeading += 10) % 360);
+				}
+				break;
+			}
+		}
+	};
+
+	public void onControlClick(View v) {
+		for (Sphero robot : mRobots.values()) {
+			robot.rotate((mHeading += 10) % 360);
+		}
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+		mRobotMgr.shutdown();
 	}
 
 	/** Called when the activity is first created. */
@@ -37,51 +77,58 @@ public class BallMoverActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		RobotProvider.getDefaultProvider().addConnectionListener(
-				new ConnectionListener() {
-					@Override
-					public void onConnected(Robot robot) {
-						mRobot = (Sphero) robot;
-						MsgLongBox("onConnected: " + robot.getName());
+		// always light on
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-						BallMoverActivity.this.connected();
+		mRobotMgr = RobotProvider.getDefaultProvider();
+		mRobotMgr.addConnectionListener(new ConnectionListener() {
+			@Override
+			public void onConnected(Robot robot) {
+				Sphero sphero = (Sphero) robot;
+				if (mRobots.containsKey(sphero.getName())) {
+					msgLong("onConnected again: " + sphero.getName());
+				} else {
+					msgLong("onConnected: " + sphero.getName());
+
+					mRobots.put(sphero.getName(), sphero);
+
+					for (int i = 0; i < 3; i++) {
+						mHandler.sendEmptyMessageDelayed(MSG_ROTATE, i * 1000);
 					}
+					// BallMoverActivity.this.onConnected(sphero);
+				}
+			}
 
-					@Override
-					public void onConnectionFailed(Robot robot) {
-						MsgLongBox("onConnectionFailed: " + robot.getName());
-					}
+			@Override
+			public void onConnectionFailed(Robot robot) {
+				msg("onConnectionFailed: " + robot.getName());
+			}
 
-					@Override
-					public void onDisconnected(Robot robot) {
-						MsgLongBox("onDisconnected: " + robot.getName());
+			@Override
+			public void onDisconnected(Robot robot) {
+				msg("onDisconnected: " + robot.getName());
+				mRobots.remove(robot.getName());
+			}
+		});
 
-						BallMoverActivity.this.stopBlink();
-						mRobot = null;
-					}
-				});
+		mRobotMgr.addDiscoveryListener(new DiscoveryListener() {
+			@Override
+			public void onBluetoothDisabled() {
+				msg("onBluetoothDisabled");
+			}
 
-		RobotProvider.getDefaultProvider().addDiscoveryListener(
-				new DiscoveryListener() {
-					@Override
-					public void onBluetoothDisabled() {
-						MsgBox("onBluetoothDisabled");
-					}
+			@Override
+			public void discoveryComplete(List<Sphero> spheros) {
+				msg("discoveryComplete: found " + spheros.size() + " robots");
+			}
 
-					@Override
-					public void discoveryComplete(List<Sphero> spheros) {
-						MsgBox("discoveryComplete: found " + spheros.size()
-								+ " robots");
-					}
-
-					@Override
-					public void onFound(List<Sphero> sphero) {
-						MsgBox("onFound " + sphero);
-						RobotProvider.getDefaultProvider().connect(
-								sphero.iterator().next());
-					}
-				});
-
+			@Override
+			public void onFound(List<Sphero> sphero) {
+				msg("onFound " + sphero);
+				mRobotMgr.connect(sphero.iterator().next());
+			}
+		});
 	}
 
 	/** Called when the user comes back to this app */
@@ -89,10 +136,9 @@ public class BallMoverActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-		boolean success = RobotProvider.getDefaultProvider().startDiscovery(
-				this);
+		boolean success = mRobotMgr.startDiscovery(this);
 		if (!success) {
-			MsgBox("Unable To start Discovery!");
+			msgLong("Unable To start Discovery!");
 		}
 	}
 
@@ -100,14 +146,15 @@ public class BallMoverActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		this.stopBlink();
-		RobotProvider.getDefaultProvider().disconnectControlledRobots();
+
+		mRobotMgr.endDiscovery();
+		mRobotMgr.disconnectControlledRobots();
 	}
 
-	private void connected() {
+	private void onConnected(Sphero robot) {
 		Log.d(TAG, "Connected On Thread: " + Thread.currentThread().getName());
 
-		final SensorControl control = mRobot.getSensorControl();
+		final SensorControl control = robot.getSensorControl();
 		control.addSensorListener(new SensorListener() {
 			@Override
 			public void sensorUpdated(DeviceSensorsData sensorDataArray) {
@@ -116,12 +163,12 @@ public class BallMoverActivity extends Activity {
 		}, SensorFlag.ACCELEROMETER_NORMALIZED, SensorFlag.GYRO_NORMALIZED);
 
 		control.setRate(1);
-		mRobot.enableStabilization(false);
-		mRobot.drive(90, 0);
-		mRobot.setBackLEDBrightness(.5f);
+		robot.enableStabilization(false);
+		robot.drive(90, 0);
+		robot.setBackLEDBrightness(.5f);
 
-		mRobot.getCollisionControl().startDetection(255, 255, 255, 255, 255);
-		mRobot.getCollisionControl().addCollisionListener(
+		robot.getCollisionControl().startDetection(255, 255, 255, 255, 255);
+		robot.getCollisionControl().addCollisionListener(
 				new CollisionListener() {
 					public void collisionDetected(
 							CollisionDetectedAsyncData collisionData) {
@@ -129,67 +176,24 @@ public class BallMoverActivity extends Activity {
 					}
 				});
 
-		BallMoverActivity.this.blink(false); // Blink the robot's LED
-
-		boolean preventSleepInCharger = mRobot.getConfiguration()
-				.isPersistentFlagEnabled(
-						PersistentOptionFlags.PreventSleepInCharger);
+		mRobotCfg = robot.getConfiguration();
+		boolean preventSleepInCharger = mRobotCfg
+				.isPersistentFlagEnabled(PersistentOptionFlags.PreventSleepInCharger);
 		Log.d(TAG, "Prevent Sleep in charger = " + preventSleepInCharger);
 		Log.d(TAG,
 				"VectorDrive = "
-						+ mRobot.getConfiguration().isPersistentFlagEnabled(
-								PersistentOptionFlags.EnableVectorDrive));
+						+ mRobotCfg
+								.isPersistentFlagEnabled(PersistentOptionFlags.EnableVectorDrive));
 
-		mRobot.getConfiguration().setPersistentFlag(
+		mRobotCfg.setPersistentFlag(
 				PersistentOptionFlags.PreventSleepInCharger, false);
-		mRobot.getConfiguration().setPersistentFlag(
-				PersistentOptionFlags.EnableVectorDrive, true);
+		mRobotCfg.setPersistentFlag(PersistentOptionFlags.EnableVectorDrive,
+				true);
 
 		Log.d(TAG,
 				"VectorDrive = "
-						+ mRobot.getConfiguration().isPersistentFlagEnabled(
-								PersistentOptionFlags.EnableVectorDrive));
-		Log.v(TAG, mRobot.getConfiguration().toString());
-
-	}
-
-	boolean blinking = true;
-
-	private void stopBlink() {
-		blinking = false;
-	}
-
-	/**
-	 * Causes the robot to blink once every second.
-	 * 
-	 * @param lit
-	 */
-	float mHeading = 0;
-
-	private void blink(final boolean lit) {
-		if (mRobot == null) {
-			blinking = false;
-			return;
-		}
-
-		// If not lit, send command to show blue light, or else, send command to
-		// show no light
-		if (lit) {
-			// mRobot.setColor(0, 0, 0);
-			mRobot.drive(mHeading += 0.1, 1);
-
-		} else {
-			// mRobot.setColor(0, 255, 0);
-		}
-
-		if (blinking) {
-			// Send delayed message on a handler to run blink again
-			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				public void run() {
-					blink(!lit);
-				}
-			}, 2000);
-		}
+						+ mRobotCfg
+								.isPersistentFlagEnabled(PersistentOptionFlags.EnableVectorDrive));
+		Log.v(TAG, mRobotCfg.toString());
 	}
 }
