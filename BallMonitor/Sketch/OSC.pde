@@ -14,14 +14,19 @@ void setupOsc() {
     /* start oscP5, listening for incoming messages at port 12000 */
     oscP5 = new OscP5(this, 3333);
 
-    /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
-     * an ip address and a port number. myRemoteLocation is used as parameter in
-     * oscP5.send() when sending osc packets to another computer, device,
-     * application. usage see below. for testing purposes the listening port
-     * and the port of the remote location address are the same, hence you will
-     * send messages back to this sketch.
-     */
+    oscP5.plug(this, "tuio2Dcur", "/tuio/2Dcur", "sifffff");
+
     myRemoteLocation = new NetAddress("127.0.0.1", 4444);
+}
+
+final int FAKE_BLOB_ID = 9999;
+
+public void tuio2Dcur(String addrPattern, int id, float x, float y, float fvx, float fvy, float fa) {
+    if (id == FAKE_BLOB_ID) {
+        println("target x:" + x + " y:" + y);
+    } else {
+        println("ball_" + id + " x:" + x + " y:" + y);
+    }
 }
 
 private void testOsc() {
@@ -58,7 +63,7 @@ void sendOsc(String name, int value) {
 }
 
 /* incoming osc message are forwarded to the oscEvent method. */
-void oscEvent(OscMessage msg) {
+void _oscEvent(OscMessage msg) {
     /* print the address pattern and the typetag of the received OscMessage */
     print("### received an osc message.");
     print(" addrpattern: " + msg.addrPattern());
