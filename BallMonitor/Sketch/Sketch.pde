@@ -3,9 +3,9 @@ float lastMouseMillis;
 float millis; // The value of millis() at the beginning of draw()
 
 void setup() {
-    size(displayWidth, displayHeight, P2D);
+    size(displayWidth / 2, displayHeight / 2, P2D);
     setupGUI();
-    // setupOsc();
+    setupOsc();
 
     Ani.init(this);
     Ani.noOverwrite(); 

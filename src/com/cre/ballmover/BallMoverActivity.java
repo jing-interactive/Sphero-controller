@@ -17,7 +17,6 @@ import orbotix.sphero.SensorControl;
 import orbotix.sphero.SensorFlag;
 import orbotix.sphero.SensorListener;
 import orbotix.sphero.Sphero;
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,7 +25,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class BallMoverActivity extends Activity {
+public class BallMoverActivity extends com.cre.BaseActivity {
 	public static final String TAG = "BallMover";
 
 	private RobotProvider mRobotMgr;
@@ -47,6 +46,10 @@ public class BallMoverActivity extends Activity {
 
 	private static final int MSG_ROTATE = 0;
 
+	protected String getAppAboutMe() {
+		return "Mobile Control. Copyright： CRE Shanghai (2015 - 2015)";
+	}
+
 	private Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -64,6 +67,7 @@ public class BallMoverActivity extends Activity {
 		for (Sphero robot : mRobots.values()) {
 			robot.rotate((mHeading += 10) % 360);
 		}
+		sendCmd("/test", 1);
 	}
 
 	public void onDestroy() {
@@ -128,13 +132,12 @@ public class BallMoverActivity extends Activity {
 				if (false) {
 					msgLong("onFound: " + spheros);
 					mRobotMgr.connect(spheros.iterator().next());
-				}
-				else{
+				} else {
 					for (Sphero sphero : spheros) {
 						msgLong("onFound: " + sphero);
 						mRobotMgr.control(sphero);
-//						mRobotMgr.endDiscovery();
-//						break;
+						// mRobotMgr.endDiscovery();
+						// break;
 					}
 					mRobotMgr.connectControlledRobots();
 				}
@@ -206,5 +209,11 @@ public class BallMoverActivity extends Activity {
 						+ mRobotCfg
 								.isPersistentFlagEnabled(PersistentOptionFlags.EnableVectorDrive));
 		Log.v(TAG, mRobotCfg.toString());
+	}
+
+	@Override
+	public void setLayout(int layoutId) {
+		// TODO Auto-generated method stub
+		
 	}
 }
