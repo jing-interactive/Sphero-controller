@@ -11,22 +11,9 @@ OscP5 oscP5;
 NetAddress myRemoteLocation;
 
 void setupOsc() {
-    /* start oscP5, listening for incoming messages at port 12000 */
-    oscP5 = new OscP5(this, 3333);
+    oscP5 = new OscP5(this, OSC_LOCAL_PORT);
 
-    oscP5.plug(this, "tuio2Dcur", "/tuio/2Dcur", "sifffff");
-
-    myRemoteLocation = new NetAddress("127.0.0.1", 4444);
-}
-
-final int FAKE_BLOB_ID = 9999;
-
-public void tuio2Dcur(String addrPattern, int id, float x, float y, float fvx, float fvy, float fa) {
-    if (id == FAKE_BLOB_ID) {
-        println("target x:" + x + " y:" + y);
-    } else {
-        println("ball_" + id + " x:" + x + " y:" + y);
-    }
+    myRemoteLocation = new NetAddress("127.0.0.1", OSC_REMOTE_PORT);
 }
 
 private void testOsc() {
@@ -63,12 +50,14 @@ void sendOsc(String name, int value) {
 }
 
 /* incoming osc message are forwarded to the oscEvent method. */
-void _oscEvent(OscMessage msg) {
+void oscEvent(OscMessage msg) {
     /* print the address pattern and the typetag of the received OscMessage */
     print("### received an osc message.");
     print(" addrpattern: " + msg.addrPattern());
     println(" typetag: " + msg.typetag());
     println(" from " + msg.address());
+
+    // myRemoteLocation = ?;
 
     if (msg.checkAddrPattern("/state")) {
         State newState = null;

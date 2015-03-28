@@ -6,9 +6,10 @@ void setup() {
     size(displayWidth / 2, displayHeight / 2, P2D);
     setupGUI();
     setupOsc();
+    setupTuio();
 
     Ani.init(this);
-    Ani.noOverwrite(); 
+    Ani.noOverwrite();
 
     changeState(new IntroState());
 
