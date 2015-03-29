@@ -3,7 +3,15 @@ public class Sphero {
     PVector realPos = new PVector(); // real world
     PVector tuioPos0 = new PVector(); // initial position
     PVector tuioPos = new PVector(); // recv from KinServer
+    float baseDegree;
     long tuioId;
+}
+
+void sendSpheroMove(float heading, float velocity) {
+    OscMessage msg = new OscMessage(SharedConfig.MSG_MOVE);
+    msg.add(heading);
+    msg.add(velocity);
+    oscP5.send(msg, myRemoteLocation);
 }
 
 Map<Long, Sphero> mSpheros = new HashMap<Long, Sphero>();

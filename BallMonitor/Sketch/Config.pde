@@ -6,3 +6,4 @@ String CFG_PAD_IP = "127.0.0.1";
 boolean SHOW_GUI = true;
 
 float CALIBRATION_MOVE_VELOCITY = 0.05;
+float CALIBRATION_READY_SECONDS = 2;

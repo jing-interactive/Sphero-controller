@@ -54,24 +54,24 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 		return SharedConfig.OSC_PAD_PORT;
 	}
 
-	private static final int MSG_ROTATE = 0;
+	// private static final int MSG_ROTATE = 0;
 
 	protected String getAppAboutMe() {
 		return "Mobile Control. Copyright： CRE Shanghai (2015 - 2015)";
 	}
 
-//	private Handler mHandler = new Handler() {
-//		@Override
-//		public void handleMessage(Message msg) {
-//			switch (msg.what) {
-//			case MSG_ROTATE:
-//				for (Sphero robot : mRobots.values()) {
-//					robot.rotate((mHeading += 10) % 360);
-//				}
-//				break;
-//			}
-//		}
-//	};
+	// private Handler mHandler = new Handler() {
+	// @Override
+	// public void handleMessage(Message msg) {
+	// switch (msg.what) {
+	// case MSG_ROTATE:
+	// for (Sphero robot : mRobots.values()) {
+	// robot.rotate((mHeading += 10) % 360);
+	// }
+	// break;
+	// }
+	// }
+	// };
 
 	public void onControlClick(View v) {
 		for (Sphero robot : mRobots.values()) {
@@ -111,9 +111,9 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 
 					mRobots.put(sphero.getName(), sphero);
 
-//					for (int i = 0; i < 3; i++) {
-//						mHandler.sendEmptyMessageDelayed(MSG_ROTATE, i * 1000);
-//					}
+					// for (int i = 0; i < 3; i++) {
+					// mHandler.sendEmptyMessageDelayed(MSG_ROTATE, i * 1000);
+					// }
 					// BallMoverActivity.this.onConnected(sphero);
 				}
 				answerDeviceCount();
@@ -167,14 +167,10 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 				if (m.checkAddress(SharedConfig.MSG_DEVICE_QUERY)) {
 					answerDeviceCount();
 				} else if (m.checkAddress(SharedConfig.MSG_MOVE)) {
-					float velocity = m.get(0).floatValue();
-					for (Sphero robot : mRobots.values()) {
-						robot.drive(0, velocity);
-					}
-				} else if (m.checkAddress(SharedConfig.MSG_ROTATE)) {
 					float heading = m.get(0).floatValue();
+					float velocity = m.get(1).floatValue();
 					for (Sphero robot : mRobots.values()) {
-						robot.rotate(heading % 360);
+						robot.drive(heading, velocity);
 					}
 				}
 			}
