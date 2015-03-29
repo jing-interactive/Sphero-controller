@@ -10,10 +10,11 @@ import netP5.*;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
+boolean isPadIpRecieved = false;
 void setupOsc() {
-    oscP5 = new OscP5(this, OSC_LOCAL_PORT);
+    oscP5 = new OscP5(this, SharedConfig.OSC_PC_PORT);
 
-    myRemoteLocation = new NetAddress("127.0.0.1", OSC_REMOTE_PORT);
+    myRemoteLocation = new NetAddress(CFG_PAD_IP, SharedConfig.OSC_PAD_PORT);
 }
 
 private void testOsc() {
@@ -49,29 +50,16 @@ void sendOsc(String name, int value) {
     oscP5.send(msg, myRemoteLocation);
 }
 
-/* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage msg) {
-    /* print the address pattern and the typetag of the received OscMessage */
-    print("### received an osc message.");
-    print(" addrpattern: " + msg.addrPattern());
+    print(msg.addrPattern());
     println(" typetag: " + msg.typetag());
-    println(" from " + msg.address());
+    // println(" from " + msg.address());
 
-    // myRemoteLocation = ?;
-
-    if (msg.checkAddrPattern("/state")) {
-        State newState = null;
-        String state = msg.get(0).stringValue();
-        if (state.equals("menu")) {
-            newState = new MenuState();
-        } else if (state.equals("intro")) {
-            newState = new IntroState();
-        }
-
-        if (newState != null) {
-            changeState(newState);
-            return;
-        }
+    if (!isPadIpRecieved) {
+        isPadIpRecieved = true;
+        CFG_PAD_IP = msg.address().substring(1);
+        saveConfig(); // HACK: should be automatically
+        myRemoteLocation = new NetAddress(CFG_PAD_IP, SharedConfig.OSC_PAD_PORT);
     }
 
     currentState.oscEvent(msg);

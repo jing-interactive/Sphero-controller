@@ -3,27 +3,26 @@ import TUIO.*;
 TuioProcessing tuioClient;
 
 void setupTuio() {
-    tuioClient  = new TuioProcessing(this, TUIO_LOCAL_PORT);
+    tuioClient  = new TuioProcessing(this, SharedConfig.TUIO_LOCAL_PORT);
 }
 
 final int FAKE_BLOB_ID = 9999;
 
 void addTuioCursor(TuioCursor tcur) {
-    println("add cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY());
+    // println("add cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY());
     addTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
 }
 
 void updateTuioCursor (TuioCursor tcur) {
-    println("set cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY()
-            + " " + tcur.getMotionSpeed() + " " + tcur.getMotionAccel());
+    // println("set cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY()
+            // + " " + tcur.getMotionSpeed() + " " + tcur.getMotionAccel());
     updateTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
 }
 
 void removeTuioCursor(TuioCursor tcur) {
-    println("del cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ")");
+    // println("del cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ")");
     removeTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
 }
-
 
 void addTuioObject(TuioObject tobj) {
     // println("add obj "+tobj.getSymbolID()+" ("+tobj.getSessionID()+") "+tobj.getX()+" "+tobj.getY()+" "+tobj.getAngle());

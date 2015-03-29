@@ -17,6 +17,8 @@ import orbotix.sphero.SensorControl;
 import orbotix.sphero.SensorFlag;
 import orbotix.sphero.SensorListener;
 import orbotix.sphero.Sphero;
+import oscP5.OscEventListener;
+import oscP5.OscMessage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,35 +46,47 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 		Toast.makeText(BallMoverActivity.this, msg, Toast.LENGTH_LONG).show();
 	}
 
+	public int getRemotePort() {
+		return SharedConfig.OSC_PC_PORT;
+	}
+
+	public int getListenPort() {
+		return SharedConfig.OSC_PAD_PORT;
+	}
+
 	private static final int MSG_ROTATE = 0;
 
 	protected String getAppAboutMe() {
 		return "Mobile Control. Copyright： CRE Shanghai (2015 - 2015)";
 	}
 
-	private Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case MSG_ROTATE:
-				for (Sphero robot : mRobots.values()) {
-					robot.rotate((mHeading += 10) % 360);
-				}
-				break;
-			}
-		}
-	};
+//	private Handler mHandler = new Handler() {
+//		@Override
+//		public void handleMessage(Message msg) {
+//			switch (msg.what) {
+//			case MSG_ROTATE:
+//				for (Sphero robot : mRobots.values()) {
+//					robot.rotate((mHeading += 10) % 360);
+//				}
+//				break;
+//			}
+//		}
+//	};
 
 	public void onControlClick(View v) {
 		for (Sphero robot : mRobots.values()) {
 			robot.rotate((mHeading += 10) % 360);
 		}
-		sendCmd("/test", 1);
+		answerDeviceCount();
 	}
 
 	public void onDestroy() {
 		super.onDestroy();
 		mRobotMgr.shutdown();
+	}
+
+	void answerDeviceCount() {
+		sendCmd(SharedConfig.MSG_DEVICE_ANSWER, mRobots.size());
 	}
 
 	/** Called when the activity is first created. */
@@ -97,22 +111,25 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 
 					mRobots.put(sphero.getName(), sphero);
 
-					for (int i = 0; i < 3; i++) {
-						mHandler.sendEmptyMessageDelayed(MSG_ROTATE, i * 1000);
-					}
+//					for (int i = 0; i < 3; i++) {
+//						mHandler.sendEmptyMessageDelayed(MSG_ROTATE, i * 1000);
+//					}
 					// BallMoverActivity.this.onConnected(sphero);
 				}
+				answerDeviceCount();
 			}
 
 			@Override
 			public void onConnectionFailed(Robot robot) {
 				msg("onConnectionFailed: " + robot.getName());
+				answerDeviceCount();
 			}
 
 			@Override
 			public void onDisconnected(Robot robot) {
 				msg("onDisconnected: " + robot.getName());
 				mRobots.remove(robot.getName());
+				answerDeviceCount();
 			}
 		});
 
@@ -140,9 +157,29 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 						// break;
 					}
 					mRobotMgr.connectControlledRobots();
+					answerDeviceCount();
 				}
 			}
 		});
+
+		mOscServer.addListener(new OscEventListener() {
+			public void oscEvent(OscMessage m) {
+				if (m.checkAddress(SharedConfig.MSG_DEVICE_QUERY)) {
+					answerDeviceCount();
+				} else if (m.checkAddress(SharedConfig.MSG_MOVE)) {
+					float velocity = m.get(0).floatValue();
+					for (Sphero robot : mRobots.values()) {
+						robot.drive(0, velocity);
+					}
+				} else if (m.checkAddress(SharedConfig.MSG_ROTATE)) {
+					float heading = m.get(0).floatValue();
+					for (Sphero robot : mRobots.values()) {
+						robot.rotate(heading % 360);
+					}
+				}
+			}
+		});
+
 	}
 
 	/** Called when the user comes back to this app */
@@ -214,6 +251,6 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 	@Override
 	public void setLayout(int layoutId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

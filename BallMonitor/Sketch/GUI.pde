@@ -15,7 +15,15 @@ void loadConfig() {
         for (Field field : cfgFields) {
             JSONObject item = items.getJSONObject(field.getName());
             String value = item.getString("value");
-            field.set(this, Float.valueOf(value));
+
+            Class<?> type = field.getType();
+            if (type.equals(boolean.class)) {
+                field.set(this, Boolean.valueOf(value));
+            } else if (type.equals(float.class)) {
+                field.set(this, Float.valueOf(value));
+            } else if (type.equals(String.class)) {
+                field.set(this, value);
+            }
         }
     } catch (Exception e) {
         saveConfig();
@@ -63,6 +71,10 @@ void setupGUI() {
             addToggle(fieldName);
             continue;
         }
+        if (type.equals(String.class)) {
+            // addStatic(fieldName);
+            continue;
+        }
 
         if (field.getAnnotations().length > 0) {
             for (Annotation annotation : field.getAnnotations()) {
@@ -89,6 +101,15 @@ void setupGUI() {
     .linebreak()
     ;
 }
+
+// Static addStatic(String name) {
+//     return cp5.addStatic(name)
+//            // .setSize(50, 20)
+//            .setMode(ControlP5.SWITCH)
+//            .linebreak()
+//            .setGroup(grpConfig)
+//            ;
+// }
 
 Toggle addToggle(String name) {
     return cp5.addToggle(name)

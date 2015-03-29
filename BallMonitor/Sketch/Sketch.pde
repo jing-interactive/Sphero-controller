@@ -5,13 +5,14 @@ float millis; // The value of millis() at the beginning of draw()
 void setup() {
     size(displayWidth / 2, displayHeight / 2, P2D);
     setupGUI();
-    setupOsc();
-    setupTuio();
 
     Ani.init(this);
     Ani.noOverwrite();
 
-    changeState(new IntroState());
+    changeState(new IdleState());
+
+    setupOsc();
+    setupTuio();
 
     lastMouseMillis = millis();
 }
@@ -22,9 +23,9 @@ void draw() {
 
     drawGUI();
 
-    if (millis - lastMouseMillis > CFG_SWITCH_INTRO_SECONDS * 1000) {
-        if (!getStateName().equals("IntroState") ) {
-            changeState(new IntroState());
+    synchronized (mSpheros) {
+        for (Sphero item : mSpheros.values()) {
+            ellipse(item.tuioPos.x * width, item.tuioPos.y * height, 10, 10);
         }
     }
     drawState();
@@ -40,7 +41,7 @@ void drawGUI() {
         stroke(255);
         text("State: " + getStateName() + "\n" +
              "=g= GUI\n" +
-             "=m= Menu\n" +
+             "=c= Calibration\n" +
              "=i= Intro\n" +
              "\n" +
              "fps: " + int(frameRate), width - 200, 50);
@@ -51,8 +52,8 @@ void drawGUI() {
 }
 
 void keyReleased() {
-    if (key == 'm') changeState(new MenuState());
-    else if (key == 'i') changeState(new IntroState());
+    if (key == 'c') changeState(new CalibrationState());
+    else if (key == 'i') changeState(new IdleState());
 
     if (key == 'g') SHOW_GUI = !SHOW_GUI;
 }

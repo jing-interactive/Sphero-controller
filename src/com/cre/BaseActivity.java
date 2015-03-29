@@ -520,15 +520,15 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-		try {
-			Object service = getSystemService("statusbar");
-			Class<?> statusbarManager = Class
-					.forName("android.app.StatusBarManager");
-			Method test = statusbarManager.getMethod("collapse");
-			test.invoke(service);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+//		try {
+//			Object service = getSystemService("statusbar");
+//			Class<?> statusbarManager = Class
+//					.forName("android.app.StatusBarManager");
+//			Method test = statusbarManager.getMethod("collapse");
+//			test.invoke(service);
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//		}
 	}
 
 	protected void MsgBox(final String info, boolean short_one) {

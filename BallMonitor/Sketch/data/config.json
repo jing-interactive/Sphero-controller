@@ -1,4 +1,5 @@
 {
   "CFG_TEST_VALUE": {"value": "5.0"},
-  "CFG_SWITCH_INTRO_SECONDS": {"value": "5.0"}
+  "CFG_SWITCH_INTRO_SECONDS": {"value": "5.0"},
+  "CFG_PAD_IP": {"value": "192.168.1.112"}
 }

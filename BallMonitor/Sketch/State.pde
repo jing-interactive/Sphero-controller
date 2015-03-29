@@ -78,6 +78,20 @@ public class State {
     void defaultAlpha() {
         tint(255);
     }
+
+    // for sphere
+    void addTuioSphero(long tuioId, float x, float y) {
+
+    }
+
+    void updateTuioSphero(long tuioId, float x, float y) {
+
+    }
+
+    void removeTuioSphero(long tuioId, float x, float y) {
+
+    }
+
 }
 
 State currentState;
@@ -102,7 +116,7 @@ void changeState(State newState) {
     if (currentState != null) {
         println("- " + getStateName());
         currentState.quit();
-        println("- cost " + (millis() - startChangeMillis) + " ms");
+        // println("- cost " + (millis() - startChangeMillis) + " ms");
         // System.gc();
     }
     currentState = newState;
@@ -110,7 +124,7 @@ void changeState(State newState) {
     currentState.alphaEverything = 255;
     currentState.enter();
     currentState.mStartMS = millis();
-    println("Total cost " + (currentState.mStartMS - startChangeMillis) + " ms");
+    // println("Total cost " + (currentState.mStartMS - startChangeMillis) + " ms");
     lastFrameMilli = millis();
 }
 
