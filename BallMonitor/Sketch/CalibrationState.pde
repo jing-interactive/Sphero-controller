@@ -9,7 +9,7 @@ public class CalibrationState extends State {
 
 	void quit() {
 		for (Sphero item : mSpheros.values()) {
-			item.baseDegree = degrees(PVector.sub(item.tuioPos, item.tuioPos0).heading());
+			item.baseTheta = degrees(PVector.sub(item.tuioPos, item.tuioPos0).heading());
 		}
 	}
 
