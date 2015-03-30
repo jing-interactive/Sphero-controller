@@ -5,7 +5,16 @@ public class MainControlState extends State {
 		for (Sphero item : mSpheros.values()) {
 			// See BallMonitor/sketch/doc/coordinate.png
 			float alpha = degrees(PVector.sub(targetPos, item.tuioPos).heading());
-			sendSpheroMove(alpha - item.baseTheta, MAIN_CONTROL_MOVE_VELOCITY);
+			println("alpha: " + alpha);
+			if (alpha < 0) {
+				alpha += 360;
+			}
+			alpha -= item.baseTheta;
+			if (alpha < 0) {
+				alpha += 360;
+			}
+			println("final: " + alpha);
+			sendSpheroMove(alpha, MAIN_CONTROL_MOVE_VELOCITY);
 
 			// FIXME: should support multi-spheros
 			break;

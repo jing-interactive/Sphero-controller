@@ -10,18 +10,18 @@ final int FAKE_BLOB_ID = 9999;
 
 void addTuioCursor(TuioCursor tcur) {
     // println("add cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY());
-    addTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
+    addTuioSphero(tcur.getSessionID(), tcur.getX() * width, tcur.getY() * height);
 }
 
 void updateTuioCursor (TuioCursor tcur) {
     // println("set cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ") " + tcur.getX() + " " + tcur.getY()
             // + " " + tcur.getMotionSpeed() + " " + tcur.getMotionAccel());
-    updateTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
+    updateTuioSphero(tcur.getSessionID(), tcur.getX() * width, tcur.getY() * height);
 }
 
 void removeTuioCursor(TuioCursor tcur) {
     // println("del cur " + tcur.getCursorID() + " (" + tcur.getSessionID() + ")");
-    removeTuioSphero(tcur.getSessionID(), tcur.getX(), tcur.getY());
+    removeTuioSphero(tcur.getSessionID(), tcur.getX() * width, tcur.getY() * height);
 }
 
 void addTuioObject(TuioObject tobj) {

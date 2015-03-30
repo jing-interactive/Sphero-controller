@@ -3,7 +3,7 @@ float lastMouseMillis;
 float millis; // The value of millis() at the beginning of draw()
 
 void setup() {
-    size(displayWidth / 2, displayHeight / 2, P2D);
+    size(512, 424, P2D);
     setupGUI();
 
     Ani.init(this);
@@ -25,7 +25,7 @@ void draw() {
 
     synchronized (mSpheros) {
         for (Sphero item : mSpheros.values()) {
-            ellipse(item.tuioPos.x * width, item.tuioPos.y * height, 10, 10);
+            ellipse(item.tuioPos.x, item.tuioPos.y, 10, 10);
         }
     }
     drawState();
