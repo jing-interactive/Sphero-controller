@@ -4,14 +4,18 @@ public class CalibrationState extends State {
 			item.tuioPos0.set(item.tuioPos);
 		}
 
+		sendSpheroMove(0, 0);
 		sendSpheroMove(0, CALIBRATION_MOVE_VELOCITY);
 	}
 
 	void quit() {
 		for (Sphero item : mSpheros.values()) {
-			item.baseTheta = degrees(PVector.sub(item.tuioPos, item.tuioPos0).heading());
 			if (item.baseTheta < 0) {
-				item.baseTheta += 360;
+				// TODO: do you really need this?
+				item.baseTheta = degrees(PVector.sub(item.tuioPos, item.tuioPos0).heading());
+				if (item.baseTheta < 0) {
+					item.baseTheta += 360;
+				}
 			}
 			println("item.baseTheta: " + item.baseTheta);
 		}

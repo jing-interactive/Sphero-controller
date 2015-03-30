@@ -3,7 +3,7 @@ public class Sphero {
     PVector realPos = new PVector(); // real world
     PVector tuioPos0 = new PVector(); // initial position
     PVector tuioPos = new PVector(); // recv from KinServer
-    float baseTheta;
+    float baseTheta = -1; // initialize once
     long tuioId;
 }
 

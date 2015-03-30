@@ -73,11 +73,28 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 	// }
 	// };
 
-	public void onControlClick(View v) {
-		for (Sphero robot : mRobots.values()) {
-			robot.rotate((mHeading += 10) % 360);
-		}
+	public void onAnswerClick(View v) {
 		answerDeviceCount();
+	}
+
+	public void onStartClick(View v) {
+		boolean success = mRobotMgr.startDiscovery(this);
+		if (!success) {
+			msgLong("Unable To start Discovery!");
+		}
+	}
+
+	public void onStopClick(View v) {
+		mRobotMgr.endDiscovery();
+		mRobotMgr.removeAllControls();
+		mRobots.clear();
+	}
+
+	public void onSleepClick(View v) {
+		for (Sphero robot : mRobots.values()) {
+			robot.sleep(600);
+		}
+		onStopClick(v);
 	}
 
 	public void onDestroy() {
@@ -182,11 +199,7 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		boolean success = mRobotMgr.startDiscovery(this);
-		if (!success) {
-			msgLong("Unable To start Discovery!");
-		}
+		onStartClick(null);
 	}
 
 	/** Called when the user presses the back or home button */
@@ -194,8 +207,7 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 	protected void onPause() {
 		super.onPause();
 
-		mRobotMgr.endDiscovery();
-		mRobotMgr.disconnectControlledRobots();
+		onStopClick(null);
 	}
 
 	private void onConnected(Sphero robot) {

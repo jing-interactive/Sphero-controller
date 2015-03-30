@@ -5,12 +5,44 @@
     android:background="#ff888888" >
 
     <Button
+        android:id="@+id/Button01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Button02"
+        android:layout_centerVertical="true"
+        android:onClick="onStartClick"
+        android:text="SEARCH Robots" />
+
+    <Button
+        android:id="@+id/Button02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnHit"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:onClick="onStopClick"
+        android:text="STOP Control" />
+
+    <Button
         android:id="@+id/btnHit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:onClick="onControlClick"
-        android:text="HIT" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="56dp"
+        android:layout_marginTop="27dp"
+        android:onClick="onAnswerClick"
+        android:text="ANSWER" />
+
+    <Button
+        android:id="@+id/Button03"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="22dp"
+        android:layout_marginLeft="62dp"
+        android:layout_toRightOf="@+id/btnHit"
+        android:onClick="onSleepClick"
+        android:text="SLEEP" />
 
 </RelativeLayout>

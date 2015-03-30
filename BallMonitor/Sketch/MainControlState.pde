@@ -4,17 +4,17 @@ public class MainControlState extends State {
 		targetPos.set(width / 2, height / 2);
 		for (Sphero item : mSpheros.values()) {
 			// See BallMonitor/sketch/doc/coordinate.png
-			float alpha = degrees(PVector.sub(targetPos, item.tuioPos).heading());
-			println("alpha: " + alpha);
-			if (alpha < 0) {
-				alpha += 360;
+			float absolute = degrees(PVector.sub(targetPos, item.tuioPos).heading());
+			if (absolute < 0) {
+				absolute += 360;
 			}
-			alpha -= item.baseTheta;
-			if (alpha < 0) {
-				alpha += 360;
+			println("absolute: " + absolute);
+			float relative = absolute - item.baseTheta;
+			if (relative < 0) {
+				relative += 360;
 			}
-			println("final: " + alpha);
-			sendSpheroMove(alpha, MAIN_CONTROL_MOVE_VELOCITY);
+			println("relative: " + relative);
+			sendSpheroMove(relative, MAIN_CONTROL_MOVE_VELOCITY);
 
 			// FIXME: should support multi-spheros
 			break;
@@ -25,9 +25,14 @@ public class MainControlState extends State {
 	}
 
 	void draw() {
-		for (Sphero item : mSpheros.values()) {
-			if (PVector.dist(targetPos, item.tuioPos) < CFG_TARGET_ARRIVAL_RADIUS) {
-				println("arrived");
+		synchronized (mSpheros) {
+			for (Sphero item : mSpheros.values()) {
+				if (PVector.dist(targetPos, item.tuioPos) < CFG_TARGET_ARRIVAL_RADIUS) {
+					println("arrived");
+					sendSpheroMove(0, 0);
+				} else {
+					// changeState(new MainControlState());
+				}
 			}
 		}
 		// if (mSpheros.size() == 1 && elapsedSec() > 2) {
