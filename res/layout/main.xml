@@ -56,4 +56,15 @@
         android:onClick="onConfigClick"
         android:text="CONFIG" />
 
+    <Button
+        android:id="@+id/Button05"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/Button02"
+        android:layout_alignBottom="@+id/Button02"
+        android:layout_marginLeft="26dp"
+        android:layout_toRightOf="@+id/Button03"
+        android:onClick="onActionClick"
+        android:text="ACTION" />
+
 </RelativeLayout>

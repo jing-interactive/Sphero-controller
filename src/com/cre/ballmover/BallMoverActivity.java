@@ -20,15 +20,13 @@ import orbotix.sphero.Sphero;
 import oscP5.OscEventListener;
 import oscP5.OscMessage;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 public class BallMoverActivity extends com.cre.BaseActivity {
-	public static final String TAG = "____BallMover____";
+	public static final String TAG = "__________";
 
 	private RobotProvider mRobotMgr;
 	private ConfigurationControl mRobotCfg;
@@ -99,6 +97,14 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 	
 	public void onConfigClick(View v) {
 		showInputBox(0);
+	}
+	
+	public void onActionClick(View v) {
+		for (Sphero robot : mRobots.values()) {
+			for (int i=0;i<10;i++) {
+				robot.rotate((mHeading += 10) % 360);
+			}
+		}
 	}
 
 	public void onDestroy() {
@@ -182,6 +188,8 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 				}
 			}
 		});
+		
+//		mRobotMgr.addResponseDeliverer(deliverer);
 
 		mOscServer.addListener(new OscEventListener() {
 			public void oscEvent(OscMessage m) {
