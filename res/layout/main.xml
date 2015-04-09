@@ -45,4 +45,15 @@
         android:onClick="onSleepClick"
         android:text="SLEEP" />
 
+    <Button
+        android:id="@+id/Button04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnHit"
+        android:layout_alignBottom="@+id/btnHit"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="61dp"
+        android:onClick="onConfigClick"
+        android:text="CONFIG" />
+
 </RelativeLayout>

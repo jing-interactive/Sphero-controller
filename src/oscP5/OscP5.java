@@ -228,6 +228,7 @@ public class OscP5 implements Observer {
 	 * will be displayed.
 	 */
 	private void registerDispose( Object theObject ) {
+		
 		try {
 
 			Object parent = null;
@@ -241,8 +242,12 @@ public class OscP5 implements Observer {
 					parent = childClass.newInstance( );
 					parent = theObject;
 				}
+				else {
+					return;
+				}
+				
 			} catch ( Exception e ) {
-				e.printStackTrace( );
+//				e.printStackTrace( );
 			}
 
 			try {
@@ -250,7 +255,7 @@ public class OscP5 implements Observer {
 				try {
 					method.invoke( parent , new Object[] { "dispose" , this } );
 				} catch ( Exception e ) {
-					e.printStackTrace( );
+//					e.printStackTrace( );
 				}
 
 			} catch ( NoSuchMethodException e ) {
@@ -258,7 +263,7 @@ public class OscP5 implements Observer {
 			}
 
 		} catch ( NullPointerException e ) {
-			e.printStackTrace( );
+//			e.printStackTrace( );
 		}
 	}
 

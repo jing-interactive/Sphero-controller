@@ -28,7 +28,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 public class BallMoverActivity extends com.cre.BaseActivity {
-	public static final String TAG = "BallMover";
+	public static final String TAG = "____BallMover____";
 
 	private RobotProvider mRobotMgr;
 	private ConfigurationControl mRobotCfg;
@@ -95,6 +95,10 @@ public class BallMoverActivity extends com.cre.BaseActivity {
 			robot.sleep(600);
 		}
 		onStopClick(v);
+	}
+	
+	public void onConfigClick(View v) {
+		showInputBox(0);
 	}
 
 	public void onDestroy() {

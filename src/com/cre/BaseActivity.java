@@ -520,15 +520,15 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-//		try {
-//			Object service = getSystemService("statusbar");
-//			Class<?> statusbarManager = Class
-//					.forName("android.app.StatusBarManager");
-//			Method test = statusbarManager.getMethod("collapse");
-//			test.invoke(service);
-//		} catch (Exception ex) {
-//			ex.printStackTrace();
-//		}
+		// try {
+		// Object service = getSystemService("statusbar");
+		// Class<?> statusbarManager = Class
+		// .forName("android.app.StatusBarManager");
+		// Method test = statusbarManager.getMethod("collapse");
+		// test.invoke(service);
+		// } catch (Exception ex) {
+		// ex.printStackTrace();
+		// }
 	}
 
 	protected void MsgBox(final String info, boolean short_one) {
@@ -573,7 +573,7 @@ public abstract class BaseActivity extends Activity {
 		return true;
 	}
 
-	private void showInputBox(final int idx) {
+	protected void showInputBox(final int idx) {
 		assert (idx >= 0 && idx < getClientCount());
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
@@ -669,7 +669,11 @@ public abstract class BaseActivity extends Activity {
 					+ i);
 		MsgBox("远程IP为 " + mRemoteIps[0] + ",可在选项菜单中修改", true);
 
-		mOscServer = new OscP5(this, getListenPort());
+		try {
+			mOscServer = new OscP5(this, getListenPort());
+		} catch (Exception e) {
+
+		}
 		mOscServer.addListener(new OscEventListener() {
 
 			public void oscEvent(OscMessage m) {
@@ -701,10 +705,10 @@ public abstract class BaseActivity extends Activity {
 				}
 			}
 
-//			public void oscStatus(OscStatus theStatus) {
-//				// TODO Auto-generated method stub
-//				
-//			}
+			// public void oscStatus(OscStatus theStatus) {
+			// // TODO Auto-generated method stub
+			//
+			// }
 		});
 	}
 }
